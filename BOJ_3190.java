@@ -2,18 +2,28 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.StringTokenizer;
 
 public class BOJ_3190 {
 	static int n,k,L;
 	static int[][] board;
-	static boolean[][] isVisited;
-	static String[] s = new String[10001];
-	static int ans=1;
-	static int num=1;
-	static int tail=0;
-	static int[] dx = {-1,1,0,0}; 
-	static int[] dy = {0,0,-1,1};
+	static boolean[][] visited;
+	static Queue<Pos> q = new LinkedList<Pos>();
+	static char[] c = new char[10001];
+	static int[] dx = {0,1,0,-1};  //오, 아, 왼, 위 
+	static int[] dy = {1,0,-1,0};
+	static int ans=0;
+	static int dir = 0;
+	
+	static class Pos{
+		int x, y;
+		public Pos(int x, int y){
+			this.x = x;
+			this.y = y;
+		}
+	}
 	
 	public static void main(String[] args) throws NumberFormatException, IOException {
 		// TODO Auto-generated method stub
@@ -22,7 +32,7 @@ public class BOJ_3190 {
 		k = Integer.parseInt(br.readLine());
 		
 		board = new int[n][n];
-		isVisited = new boolean[n][n];
+		visited = new boolean[n][n];
 		
 		for(int i=0; i<k; i++) {
 			StringTokenizer st = new StringTokenizer(br.readLine());
@@ -32,236 +42,53 @@ public class BOJ_3190 {
 		}
 		
 		L = Integer.parseInt(br.readLine());
-		
 		for(int i=0; i<L; i++) {
-			StringTokenizer st = new StringTokenizer(br.readLine());
-			int cnt = Integer.parseInt(st.nextToken());
-			String c = st.nextToken();
-			
-			s[cnt]=c;
+			StringTokenizer s = new StringTokenizer(br.readLine());
+			c[Integer.parseInt(s.nextToken())] = s.nextToken().charAt(0);
 		}
-
-		isVisited[0][0]=true;
-		move(3,0,0,num);
-	
+		
+		Pos curPos = new Pos(0,0);
+		visited[curPos.x][curPos.y]=true;
+		q.add(curPos);
+		
+		while(true) {
+			++ans;
+			curPos = new Pos(curPos.x+dx[dir], curPos.y+dy[dir]);
+			
+			if(curPos.x<0 || curPos.x>=n || curPos.y<0 || curPos.y>=n || visited[curPos.x][curPos.y])
+				break;
+			
+			if(board[curPos.x][curPos.y]==0){
+				Pos retail = q.poll();
+				board[retail.x][retail.y]=0;
+				visited[retail.x][retail.y]=false;
+			}
+			
+			q.add(curPos);
+			visited[curPos.x][curPos.y]=true;
+			
+			if(c[ans]=='D' || c[ans]=='L') {
+				dir = move(dir,ans);
+			}
+		}
+		
 		System.out.println(ans);
 	}
 	
-	
-	private static void move(int dir, int x, int y, int num) {
-		if(dir==0) { //위 		
-			if(s[num]!=null) {
-				if(s[num].equals("D")) {
-					int cy = y+1;
-					if(x<0 || cy<0 || x>=n || cy>=n || isVisited[x][cy])
-						return;
-					if(board[x][cy]==1) {
-						isVisited[x][cy]=true;
-						board[x][cy]=0;
-						ans++;
-						move(3,x,cy,num+1);	
-					}else {
-						isVisited[x][y]=false;
-						isVisited[x][cy]=true;
-						ans++;
-						move(3,x,cy,num+1);
-					}
-					
-				}else if(s[num].equals("L")) {
-					int cy = y-1;
-					if(x<0 || cy<0 || x>=n || cy>=n || isVisited[x][cy])
-						return;
-					if(board[x][cy]==1) {
-						isVisited[x][cy]=true;
-						board[x][cy]=0;
-						ans++;
-						move(2,x,cy,num+1);
-					}else {
-						isVisited[x][y]=false;
-						isVisited[x][cy]=true;
-						ans++;
-						move(2,x,cy,num+1);
-					}
-					
-				}
-			}else {
-				int cx = x-1;
-				if(cx<0 || y<0 || cx>=n || y>=n || isVisited[cx][y])
-					return;
-				if(board[cx][y]==1) {
-					isVisited[cx][y]=true;
-					board[cx][y]=0;
-					ans++;
-					move(0,cx,y,num+1);
-				}else {
-					isVisited[x][y]=false;
-					isVisited[cx][y]=true;
-					ans++;
-					move(0,cx,y,num+1);
-				}
+	private static int move(int curDir, int time) {
+		int nextDir = 0;
+		if(c[time]=='D') {
+			if(curDir==3)
+				nextDir=0;
+			else
+				nextDir=curDir+1;
 			
-			}
-	
-		}else if(dir==1) { //아래 
-			if(s[num]!=null) {
-				if(s[num].equals("D")) {
-					int cy = y-1;
-					if(x<0 || cy<0 || x>=n || cy>=n || isVisited[x][cy])
-						return;
-					if(board[x][cy]==1) {
-						isVisited[x][cy]=true;
-						board[x][cy]=0;
-						ans++;
-						move(2,x,cy,num+1);	
-					}else {
-						isVisited[x][y]=false;
-						isVisited[x][cy]=true;
-						ans++;
-						move(2,x,cy,num+1);
-					}
-					
-				}else if(s[num].equals("L")) {
-					int cy = y+1;
-					if(x<0 || cy<0 || x>=n || cy>=n || isVisited[x][cy])
-						return;
-					if(board[x][cy]==1) {
-						isVisited[x][cy]=true;
-						board[x][cy]=0;
-						ans++;
-						move(3,x,cy,num+1);
-					}else {
-						isVisited[x][y]=false;
-						isVisited[x][cy]=true;
-						ans++;
-						move(3,x,cy,num+1);
-					}
-					
-				}
-			}else {
-				int cx = x+1;
-				if(cx<0 || y<0 || cx>=n || y>=n || isVisited[cx][y])
-					return;
-				if(board[cx][y]==1) {
-					isVisited[cx][y]=true;
-					board[cx][y]=0;
-					ans++;
-					move(1,cx,y,num+1);
-				}else {
-					isVisited[x][y]=false;
-					isVisited[cx][y]=true;
-					ans++;
-					move(1,cx,y,num+1);
-				}
-			
-			}
-	
-		}else if(dir==2) { //왼 
-			if(s[num]!=null) {
-				if(s[num].equals("D")) {
-					int cx = x-1;
-					if(cx<0 || y<0 || cx>=n || y>=n || isVisited[cx][y])
-						return;
-					if(board[cx][y]==1) {
-						isVisited[cx][y]=true;
-						board[cx][y]=0;
-						ans++;
-						move(0,cx,y,num+1);	
-					}else {
-						isVisited[x][y]=false;
-						isVisited[cx][y]=true;
-						ans++;
-						move(0,cx,y,num+1);
-					}
-					
-				}else if(s[num].equals("L")) {
-					int cx = x+1;
-					if(cx<0 || y<0 || cx>=n || y>=n || isVisited[cx][y])
-						return;
-					if(board[cx][y]==1) {
-						isVisited[cx][y]=true;
-						board[cx][y]=0;
-						ans++;
-						move(1,cx,y,num+1);
-					}else {
-						isVisited[x][y]=false;
-						isVisited[cx][y]=true;
-						ans++;
-						move(1,cx,y,num+1);
-					}
-					
-				}
-			}else {
-				int cy = y-1;
-				if(x<0 || cy<0 || x>=n || cy>=n || isVisited[x][cy])
-					return;
-				if(board[x][cy]==1) {
-					isVisited[x][cy]=true;
-					board[x][cy]=0;
-					ans++;
-					move(2,x,cy,num+1);
-				}else {
-					isVisited[x][y]=false;
-					isVisited[x][cy]=true;
-					ans++;
-					move(2,x,cy,num+1);
-				}
-			}
-				
-		}else if(dir==3) { //오 
-			if(s[num]!=null) {
-				if(s[num].equals("D")) {
-					int cx = x+1;
-					if(cx<0 || y<0 || cx>=n || y>=n || isVisited[cx][y]) {
-						System.exit(0);
-					}
-					if(board[cx][y]==1) {
-						isVisited[cx][y]=true;
-						board[cx][y]=0;
-						ans++;
-						move(1,cx,y,num+1);
-					}else {
-						isVisited[x][y]=false;
-						isVisited[cx][y]=true;
-						ans++;
-						move(1,cx,y,num+1);
-					}
-					
-					
-				}else if(s[num].equals("L")) {
-					int cx = x-1;
-					if(cx<0 || y<0 || cx>=n || y>=n || isVisited[cx][y])
-						System.exit(0);
-					if(board[cx][y]==1) {
-						isVisited[cx][y]=true;
-						board[cx][y]=0;
-						ans++;
-						move(0,cx,y,num+1);
-					}else {
-						isVisited[x][y]=false;
-						isVisited[cx][y]=true;
-						ans++;
-						move(0,cx,y,num+1);
-					}
-					
-					
-				}
-			}else {
-				int cy = y+1;
-				if(x<0 || cy<0 || x>=n || cy>=n || isVisited[x][cy])
-					return;
-				if(board[x][cy]==1) {
-					isVisited[x][cy]=true;
-					board[x][cy]=0;
-					ans++;
-					move(3,x,cy,num+1);
-				}else {
-					isVisited[x][y]=false;
-					isVisited[x][cy]=true;
-					ans++;
-					move(3,x,cy,num+1);
-				}
-			}		
+		}else if(c[time]=='L') {
+			if(curDir==0)
+				nextDir=3;
+			else
+				nextDir=curDir-1;		
 		}
+		return nextDir;
 	}
-
 }
