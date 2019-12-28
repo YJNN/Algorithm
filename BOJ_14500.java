@@ -39,7 +39,7 @@ public class BOJ_14500 {
 					sum += board[i][j];
 					dfs(i,j,1);
 					sum = 0;
-					visited = new boolean[n][m];
+					visited[i][j]=false;
 				}
 				
 			}

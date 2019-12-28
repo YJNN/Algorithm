@@ -27,20 +27,20 @@ public class BOJ_14620 {
 			}
 		}
 		
-		dfs(1,0,0);
+		dfs(1,1,0,0);
 		System.out.println(minNum);
 		
 
 	}
 	
-	private static void dfs(int x, int cnt, int sum) {
+	private static void dfs(int x, int y,int cnt, int sum) {
 		if(cnt==3) {
 			minNum = Math.min(sum, minNum);
 			return;
 		}
 		
 		for(int i=x; i<n-1; i++) {
-			for(int j=1; j<n-1; j++) {
+			for(int j=y; j<n-1; j++) {
 				if(isVisited[i][j])
 					continue;
 				if(!checkXY(i,j))
@@ -54,7 +54,7 @@ public class BOJ_14620 {
 					isVisited[cx][cy]=true;
 					cost += map[cx][cy];
 				}
-				dfs(i,cnt+1,sum+cost);
+				dfs(i,j,cnt+1,sum+cost);
 				
 				isVisited[i][j]=false;
 				for(int k=0; k<4; k++) {
